@@ -12,7 +12,7 @@ import os
 import time
 import urllib.parse
 import re
-
+import numpy as np
 
 def check_duplicate_with_isbn( df, 
     database = "opac-de-7",
@@ -25,6 +25,7 @@ def check_duplicate_with_isbn( df,
     namespaces = {'zs':"http://www.loc.gov/zing/srw/"}
 
 
+    df[name_column_isbn] = df[name_column_isbn].fillna(0).astype(np.int64).astype(str)
 
 
     for index, row in df.iterrows():
