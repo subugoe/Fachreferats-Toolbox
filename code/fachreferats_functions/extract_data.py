@@ -31,6 +31,7 @@ def extract_fields_with_isbn( df,
         },
     name_column = "ISBN",
     delete_ILN = True,
+    find_key = "isb"
     ):
 
 
@@ -38,30 +39,32 @@ def extract_fields_with_isbn( df,
 
 
     for index, row in df.iterrows():
-        if len(str(row[ name_column ])) > 9:
-            api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica.isb=" + str(row[ name_column ]) + "&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml"
+        if len(str(row[ name_column ])) > 6:
+            api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica." + find_key + "=" + str(row[ name_column ]) + "&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml"
             #print(api_url)
 
+            try:
+                tree = etree.parse(api_url).getroot()
+                
+                for key, xpath in xpaths.items():
 
-            tree = etree.parse(api_url).getroot()
-            
-            for key, xpath in xpaths.items():
+                    if key == "Titel":
+                        key = "nach_" + name_column + "_" + key
 
-                if key == "Titel":
-                    key = "nach_" + name_column + "_" + key
+                    value_lt =  tree.xpath(xpath, namespaces = namespaces)
 
-                value_lt =  tree.xpath(xpath, namespaces = namespaces)
-
-                #print(key, value_lt)
-                if len(value_lt) > 0:
-                    if "ILN" in key:
-                        #print(value_lt)
-                        df.loc[index, key] = ";".join(value_lt)
-                    else:
-                        df.loc[index, key] = value_lt[0]
-    
-    if "nach_ISBN_ILNs" in df.columns.tolist():
-        df["nach_" + name_column+ "_Bestand_K10"] = df["nach_ISBN_ILNs"].str.count("[,;\-]") + 1
+                    #print(key, value_lt)
+                    if len(value_lt) > 0:
+                        if "ILN" in key:
+                            #print(value_lt)
+                            df.loc[index, key] = ";".join(value_lt)
+                        else:
+                            df.loc[index, key] = value_lt[0]
+            except:
+                print("error")
+        
+    if "nach_" + name_column + "_ILNs" in df.columns.tolist():
+        df["nach_" + name_column+ "_Bestand_K10"] = df["nach_" + name_column + "_ILNs"].str.count("[,;\-]") + 1
 
     if delete_ILN == True:
         for column in df.columns.tolist():
@@ -78,6 +81,7 @@ def extract_fields_with_title( df,
         },
     name_column = "Titel",
     delete_ILN = True,
+    verbose =False,
     ):
 
 
@@ -85,9 +89,63 @@ def extract_fields_with_title( df,
 
 
     for index, row in df.iterrows():
-        if len(str(row[ name_column ])) > 9:
-            api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica.tit=" + str(row[ name_column ]) + "&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml"
-            #print(api_url)
+
+        title = str(row[ name_column ])
+        if verbose == True: print(title)
+        if len(title) > 7:
+            try:
+                api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica.tit=" + title  + "&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml"
+                if verbose == True: print(api_url)
+
+
+                tree = etree.parse(api_url).getroot()
+                
+                for key, xpath in xpaths.items():
+
+                    value_lt =  tree.xpath(xpath, namespaces = namespaces)
+
+                    if len(value_lt) > 0:
+                        if "ILN" in key:
+                            df.loc[index, key] = ";".join(value_lt)
+                        else:
+                            df.loc[index, key] = value_lt[0]
+            except:
+                print("error")
+    
+    if "nach_Titel_ILNs" in df.columns.tolist():
+        df["nach_" + name_column+ "_Bestand_K10"] = df["nach_Titel_ILNs"].str.count("[,;\-]") + 1
+
+    if delete_ILN == True:
+        for column in df.columns.tolist():
+            if "ILN" in column:
+                df.drop(column, axis=1, inplace=True)
+
+    return df
+
+
+
+def extract_fields_with_title_author( df, 
+    database = "k10plus",
+    xpaths = {
+        'nach_Titel_Autor_ILNs' : '//pica:datafield[@tag="001@"]/pica:subfield[@code="0"]/text()',
+        },
+    name_column_title = "Titel",
+    name_column_author = "Autor",
+    delete_ILN = True,
+    verbose = False,
+
+    ):
+
+
+    namespaces = {'zs':"http://www.loc.gov/zing/srw/", 'pica':'info:srw/schema/5/picaXML-v1.0'}
+
+
+
+    for index, row in df.iterrows():
+        try:
+            api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica.tit=" + str(row[ name_column_title ]) + " and pica.per=" + str(row[ name_column_author ]) + "&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml"
+
+            if verbose == True: print(api_url)
 
 
             tree = etree.parse(api_url).getroot()
@@ -101,9 +159,11 @@ def extract_fields_with_title( df,
                         df.loc[index, key] = ";".join(value_lt)
                     else:
                         df.loc[index, key] = value_lt[0]
+        except:
+            print("error")
     
-    if "nach_Titel_ILNs" in df.columns.tolist():
-        df["nach_" + name_column+ "_Bestand_K10"] = df["nach_Titel_ILNs"].str.count("[,;\-]") + 1
+    if "nach_Titel_Autor_ILNs" in df.columns.tolist():
+        df["nach_Titel_Autor_Bestand_K10"] = df["nach_Titel_Autor_ILNs"].str.count("[,;\-]") + 1
 
     if delete_ILN == True:
         for column in df.columns.tolist():
@@ -111,5 +171,6 @@ def extract_fields_with_title( df,
                 df.drop(column, axis=1, inplace=True)
 
     return df
+
 
 
