@@ -43,7 +43,7 @@ def check_duplicate_with_isbn( df,
     namespaces = {'zs':"http://www.loc.gov/zing/srw/", 'pica':'info:srw/schema/5/picaXML-v1.0'}
 
 
-    df[name_column_isbn] = df[name_column_isbn].fillna(0).astype(np.int64).astype(str)
+    #df[name_column_isbn] = df[name_column_isbn].fillna(0).astype(np.int64).astype(str)
 
 
     for index, row in df.iterrows():
