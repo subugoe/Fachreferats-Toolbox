@@ -64,6 +64,8 @@ def check_duplicate_with_isbn( df,
 
             value_lt =  tree.xpath(xpath_2, namespaces = namespaces)
 
+            df.loc[index, "nach_" + name_column_isbn + "_Ort_SUB"] = "|".join(value_lt)
+
             value_lt = [value for value in value_lt if value in ["LS1", "FMAG", ""]]
 
             df.loc[index, "nach_" + name_column_isbn + "_Bestand_SUB"] = len(value_lt)
@@ -107,7 +109,7 @@ def check_duplicate_with_title(df,
             value_lt =  tree.xpath(xpath_2, namespaces = namespaces)
 
 
-            df.loc[index, "nach_" + name_column_title + "_Ort_SUB"] = value_lt
+            df.loc[index, "nach_" + name_column_title + "_Ort_SUB"] = "|".join(value_lt)
 
             value_lt = [value for value in value_lt if value in ["LS1", "FMAG"]]
 
@@ -163,8 +165,7 @@ def check_duplicate_with_title_author( df,
 
             if verbose == True: print(value_lt)
 
-
-            df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Ort_SUB"] = value_lt
+            df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Ort_SUB"] = "|".join(value_lt)
 
             value_lt = [value for value in value_lt if value in ["LS1", "FMAG"]]
 
