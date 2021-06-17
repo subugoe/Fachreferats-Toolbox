@@ -120,7 +120,7 @@ def check_duplicate_with_title(df,
 
             df.loc[index, "nach_" + name_column_title + "_URL_GUK"] = "https://opac.sub.uni-goettingen.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=tit " +  title + "&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB="
         except:
-            df.loc[index, "error"] = 1            
+            df.loc[index, "error_nach_title"] = 1            
 
 
 
@@ -173,5 +173,5 @@ def check_duplicate_with_title_author( df,
 
             df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=TIT"' +  title + '" and PER ' + author+  '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
         except:
-            df.loc[index, "error"] = 1
+            df.loc[index, "error_nach_author_title"] = 1
     return df
