@@ -6,21 +6,6 @@ Created on 2021
 """
 
 
-"""
-
-- SUB = HG + BB + BWald +  
-    - Definition: FMAG, LS1, HG, Normales Magazin (keine Unterfeld in $f)
-
-
-https://www.sub.uni-goettingen.de/nc/standorte-raumangebote/standorte-mit-oeffnungszeiten/bibliotheken-in-goettingen/sigelliste/
-- Magazinexemplar ohne sst-Angabe: PPN 232624712
-
-https://www.sub.uni-goettingen.de/standorte-raumangebote/standorte-mit-oeffnungszeiten/
-BBF, BBK, BBM, BBN, BBW, BBWISO, 
-
-https://intranet.sub.uni-goettingen.de/display/grpBEInfo/Sonderstandorte+ZB+und+HG
-"""
-
 import pandas as pd
 from lxml import etree
 import requests
@@ -30,8 +15,10 @@ import urllib.parse
 import re
 import numpy as np
 
+
+
 def check_duplicate_with_isbn( df, 
-    database = "opac-de-7",
+    database = "opac-de-7", #rk-goettingen
     xpath_1 = '//zs:numberOfRecords/text()',
     xpath_2 = '//pica:datafield[@tag="209A"]/pica:subfield[@code="f"]/text()',
     name_column_isbn = "ISBN",
@@ -64,11 +51,11 @@ def check_duplicate_with_isbn( df,
 
             value_lt =  tree.xpath(xpath_2, namespaces = namespaces)
 
-            df.loc[index, "nach_" + name_column_isbn + "_Ort_SUB"] = "|".join(value_lt)
+            df.loc[index, "nach_" + name_column_isbn + "_Ort_Göttingen"] = str(list(set(value_lt)))
 
-            value_lt = [value for value in value_lt if value in ["LS1", "FMAG", ""]]
+            #value_lt = [value for value in value_lt if value in ["LS1", "FMAG", ""]]
 
-            df.loc[index, "nach_" + name_column_isbn + "_Bestand_SUB"] = len(value_lt)
+            #df.loc[index, "nach_" + name_column_isbn + "_Bestand_SUB"] = len(value_lt)
 
             df.loc[index, "nach_" + name_column_isbn + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=6/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=isb+' + str(row[ name_column_isbn ]) + '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
 
@@ -108,13 +95,12 @@ def check_duplicate_with_title(df,
 
             value_lt =  tree.xpath(xpath_2, namespaces = namespaces)
 
-
-            df.loc[index, "nach_" + name_column_title + "_Ort_SUB"] = "|".join(value_lt)
+            df.loc[index, "nach_" + name_column_title + "_Ort_Göttingen"] = str(list(set(value_lt)))
 
             value_lt = [value for value in value_lt if value in ["LS1", "FMAG"]]
 
 
-            df.loc[index, "nach_" + name_column_title + "_Bestand_SUB"] = len(value_lt)
+            #df.loc[index, "nach_" + name_column_title + "_Bestand_SUB"] = len(value_lt)
 
             if verbose == True: print(value_lt)
 
@@ -165,11 +151,11 @@ def check_duplicate_with_title_author( df,
 
             if verbose == True: print(value_lt)
 
-            df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Ort_SUB"] = "|".join(value_lt)
+            df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Ort_Göttingen"] = str(list(set(value_lt)))
 
             value_lt = [value for value in value_lt if value in ["LS1", "FMAG"]]
 
-            df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Bestand_SUB"] = len(value_lt)
+            #df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Bestand_SUB"] = len(value_lt)
 
             df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=TIT"' +  title + '" and PER ' + author+  '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
         except:
