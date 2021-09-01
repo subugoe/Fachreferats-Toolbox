@@ -21,6 +21,8 @@ def check_duplicate_with_isbn( df,
     database = "opac-de-7", #rk-goettingen
     xpath_1 = '//zs:numberOfRecords/text()',
     xpath_2 = '//pica:datafield[@tag="209A"]/pica:subfield[@code="f"]/text()',
+    xpath_3 = '//pica:datafield[@tag="002@"]/pica:subfield[@code="0"]/text()',
+
     name_column_isbn = "ISBN",
     name_column_title = "Titel",
     verbose = False
@@ -50,8 +52,10 @@ def check_duplicate_with_isbn( df,
             df.loc[index, "nach_" + name_column_isbn + "_Bestand_Göttingen"] = value_lt[0]
 
             value_lt =  tree.xpath(xpath_2, namespaces = namespaces)
-
             df.loc[index, "nach_" + name_column_isbn + "_Ort_Göttingen"] = "|".join(list(set(value_lt)))
+
+            value_lt =  tree.xpath(xpath_3, namespaces = namespaces)
+            df.loc[index, "nach_" + name_column_isbn + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
 
             #value_lt = [value for value in value_lt if value in ["LS1", "FMAG", ""]]
 
