@@ -45,17 +45,37 @@ def convert_ISBN_to_str(df):
         df["ISBN"] = df["ISBN"].astype(str)
     return df
 
+
 def clean_ISBN(df):
     df["ISBN"].fillna("", inplace = True)
     df["ISBN"] = df["ISBN"].str.replace(r"\D", "", regex=True)
     return df
 
+
+def clean_author(df, author_variants = ["vorname_autor", "vorname", "Vorname", "nachname_autor", "author","authors", "Autor", "Autoren", "Vorname_Autor", "Nachname_Autor"]):
+
+    for author_variant in author_variants:
+        if author_variant in df.columns.tolist():
+            df[author_variant].fillna("", inplace = True)
+
+    return df
+
+def clean_title(df, title_variants = ["titel", "title", "Titel", "Title"]):
+    
+    for title_variant in title_variants:
+        if title_variant in df.columns.tolist():
+            df[title_variant].fillna("", inplace = True)
+
+    return df
+
+
 def clean_data(
     df,
+
     mandatory_columns =
         {
             "Titel" : ["titel", "title"],
-            "Vorname_Autor" : ["vorname_autor", "vorname", "Vorname"],
+            "Vorname_Autor" : ["vorname_autor", "vorname", "Vorname",],
             "Nachname_Autor": ["nachname_autor", "author", ],
             "Erscheinungsjahr" : ["erscheinungsjahr", "jahr"],
             "ISBN" : ["isbn", "isbn-10", "ISBN-10"]
@@ -71,5 +91,9 @@ def clean_data(
     df = convert_ISBN_to_str(df)
 
     df = clean_ISBN(df)
-    
+
+    df = clean_author(df)
+
+    df = clean_title(df)
+
     return df

@@ -13,7 +13,7 @@ import time
 import urllib.parse
 import re
 import numpy as np
-
+from difflib import SequenceMatcher
 
 
 def extract_fields_with_isbn( df, 
@@ -62,7 +62,14 @@ def extract_fields_with_isbn( df,
                             df.loc[index, key] = value_lt[0]
             except:
                 print("error")
+    
+        try:
+            df.loc[index, "Titel_und_nach_ISBN_Titel_Ähnlichkeit_Score"] = round(SequenceMatcher(None, df.loc[index, "Titel"], df.loc[index, "nach_ISBN_Titel"]).ratio(), 2)
+        except:
+            pass
+
         
+
     if "nach_" + name_column + "_ILNs" in df.columns.tolist():
         df["nach_" + name_column+ "_Bestand_K10"] = df["nach_" + name_column + "_ILNs"].str.count("[,;\-]") + 1
 

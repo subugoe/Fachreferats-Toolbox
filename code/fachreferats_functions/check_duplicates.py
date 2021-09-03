@@ -85,7 +85,7 @@ def check_duplicate_with_title(df,
         if verbose == True: print(title)
 
 
-        api_url = 'http://sru.k10plus.de/'  + database + '!rec=1?version=1.1&query=pica.tpr="' + title + '"&operation=searchRetrieve&maximumRecords=10&recordSchema=picaxml'
+        api_url = 'http://sru.k10plus.de/'  + database + '!rec=1?version=1.1&query=pica.tit="' + title + '"&operation=searchRetrieve&maximumRecords=10&recordSchema=picaxml'
 
 
         try:
@@ -142,7 +142,7 @@ def check_duplicate_with_title_author( df,
         if verbose == True: print(title, author)
 
 
-        api_url = 'http://sru.k10plus.de/'  + database + '!rec=1?version=1.1&query=pica.tpr="' + title + '" and pica.per=' + author+ '&operation=searchRetrieve&maximumRecords=10&recordSchema=picaxml'
+        api_url = 'http://sru.k10plus.de/'  + database + '!rec=1?version=1.1&query=pica.tit="' + title + '" and pica.per=' + author+ '&operation=searchRetrieve&maximumRecords=10&recordSchema=picaxml'
         if verbose == True: print(api_url)
 
 
