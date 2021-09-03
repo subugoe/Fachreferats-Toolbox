@@ -108,7 +108,7 @@ def check_duplicate_with_title(df,
 
 
             value_lt =  tree.xpath(xpath_medium, namespaces = namespaces)
-            df.loc[index, "nach_" + name_column_isbn + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
+            df.loc[index, "nach_" + name_column_title + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
 
 
             df.loc[index, "nach_" + name_column_title + "_URL_GUK"] = "https://opac.sub.uni-goettingen.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=tit " +  title + "&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB="
