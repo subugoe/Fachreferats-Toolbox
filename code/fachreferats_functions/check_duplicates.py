@@ -25,6 +25,7 @@ def check_duplicate_with_isbn( df,
 
     name_column_isbn = "ISBN",
     name_column_title = "Titel",
+    search_key = "isb",
     verbose = False
     ):
 
@@ -36,29 +37,29 @@ def check_duplicate_with_isbn( df,
 
 
     for index, row in df.iterrows():
-        if len(row[ name_column_isbn ]) > 9:
-            api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica.isb=" + str(row[ name_column_isbn ]) + "&operation=searchRetrieve&maximumRecords=10&recordSchema=picaxml"
+        #if len(row[ name_column_isbn ]) > 7:
+        api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica." + search_key + "=" + str(row[ name_column_isbn ]) + "&operation=searchRetrieve&maximumRecords=10&recordSchema=picaxml"
 
-            if verbose == True: print(api_url)
-
-
-            tree = etree.parse(api_url).getroot()
+        if verbose == True: print(api_url)
 
 
-            value_lt =  tree.xpath(xpath_number_records, namespaces = namespaces)
-            if verbose == True: print(row[ name_column_title ], row[ name_column_isbn ], value_lt[0])
-            df.loc[index, "nach_" + name_column_isbn + "_Bestand_Göttingen"] = value_lt[0]
+        tree = etree.parse(api_url).getroot()
 
 
-            value_lt =  tree.xpath(xpath_place, namespaces = namespaces)
-            df.loc[index, "nach_" + name_column_isbn + "_Ort_Göttingen"] = "|".join(list(set(value_lt)))
+        value_lt =  tree.xpath(xpath_number_records, namespaces = namespaces)
+        if verbose == True: print(row[ name_column_title ], row[ name_column_isbn ], value_lt[0])
+        df.loc[index, "nach_" + name_column_isbn + "_Bestand_Göttingen"] = value_lt[0]
 
 
-            value_lt =  tree.xpath(xpath_medium, namespaces = namespaces)
-            df.loc[index, "nach_" + name_column_isbn + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
+        value_lt =  tree.xpath(xpath_place, namespaces = namespaces)
+        df.loc[index, "nach_" + name_column_isbn + "_Ort_Göttingen"] = "|".join(list(set(value_lt)))
 
 
-            df.loc[index, "nach_" + name_column_isbn + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=6/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=isb+' + str(row[ name_column_isbn ]) + '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
+        value_lt =  tree.xpath(xpath_medium, namespaces = namespaces)
+        df.loc[index, "nach_" + name_column_isbn + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
+
+
+        df.loc[index, "nach_" + name_column_isbn + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=6/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=isb+' + str(row[ name_column_isbn ]) + '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
 
 
     return df

@@ -19,6 +19,7 @@ from difflib import SequenceMatcher
 def extract_fields_with_isbn( df, 
     database = "k10plus",
     xpaths = {
+        'ppn' : '//pica:datafield[@tag="003@"]/pica:subfield[@code="0"]/text()',
         'Titel' : '//pica:datafield[@tag="021A"]/pica:subfield[@code="a"]/text()',
         'Vorname_Autor' : '//pica:datafield[@tag="028A"]/pica:subfield[@code="D"]/text()',
         'Nachname_Autor' : '//pica:datafield[@tag="028A"]/pica:subfield[@code="A"]/text()',
@@ -27,6 +28,7 @@ def extract_fields_with_isbn( df,
         'Verlag' : '//pica:datafield[@tag="033A"]/pica:subfield[@code="n"]/text()',
         'Erscheinungsort' : '//pica:datafield[@tag="033A"]/pica:subfield[@code="p"]/text()',
         'nach_ISBN_ILNs' : '//pica:datafield[@tag="001@"]/pica:subfield[@code="0"]/text()',
+        'medium' : '//pica:datafield[@tag="002@"]/pica:subfield[@code="0"]/text()',
 
         },
     name_column = "ISBN",
@@ -55,9 +57,9 @@ def extract_fields_with_isbn( df,
 
                     #print(key, value_lt)
                     if len(value_lt) > 0:
-                        if "ILN" in key:
+                        if "ILN" in key or "ppn" in key or "medium" in key:
                             #print(value_lt)
-                            df.loc[index, key] = ";".join(value_lt)
+                            df.loc[index, key] = "|".join(value_lt)
                         else:
                             df.loc[index, key] = value_lt[0]
             except:
@@ -85,6 +87,8 @@ def extract_fields_with_title( df,
     database = "k10plus",
     xpaths = {
         'nach_Titel_ILNs' : '//pica:datafield[@tag="001@"]/pica:subfield[@code="0"]/text()',
+        'nach_Titel_ppn' : '//pica:datafield[@tag="003@"]/pica:subfield[@code="0"]/text()',
+        'nach_Titel_medium' : '//pica:datafield[@tag="002@"]/pica:subfield[@code="0"]/text()',
         },
     name_column = "Titel",
     delete_ILN = True,
@@ -112,10 +116,7 @@ def extract_fields_with_title( df,
                     value_lt =  tree.xpath(xpath, namespaces = namespaces)
 
                     if len(value_lt) > 0:
-                        if "ILN" in key:
-                            df.loc[index, key] = ";".join(value_lt)
-                        else:
-                            df.loc[index, key] = value_lt[0]
+                        df.loc[index, key] = "|".join(value_lt)
             except:
                 print("error")
     
@@ -135,6 +136,8 @@ def extract_fields_with_title_author( df,
     database = "k10plus",
     xpaths = {
         'nach_Titel_Autor_ILNs' : '//pica:datafield[@tag="001@"]/pica:subfield[@code="0"]/text()',
+        'nach_Titel_Autor_ppn' : '//pica:datafield[@tag="003@"]/pica:subfield[@code="0"]/text()',
+        'nach_Titel_Autor_medium' : '//pica:datafield[@tag="002@"]/pica:subfield[@code="0"]/text()',
         },
     name_column_title = "Titel",
     name_column_author = "Autor",
@@ -162,10 +165,7 @@ def extract_fields_with_title_author( df,
                 value_lt =  tree.xpath(xpath, namespaces = namespaces)
 
                 if len(value_lt) > 0:
-                    if "ILN" in key:
-                        df.loc[index, key] = ";".join(value_lt)
-                    else:
-                        df.loc[index, key] = value_lt[0]
+                    df.loc[index, key] = "|".join(value_lt)
         except:
             print("error")
     
