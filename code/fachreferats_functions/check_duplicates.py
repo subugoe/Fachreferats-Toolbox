@@ -47,8 +47,8 @@ def check_duplicate_with_isbn( df,
 
 
         value_lt =  tree.xpath(xpath_number_records, namespaces = namespaces)
-        if verbose == True: print(row[ name_column_title ], row[ name_column_isbn ], value_lt[0])
-        df.loc[index, "nach_" + name_column_isbn + "_Bestand_Göttingen"] = value_lt[0]
+        if verbose == True: print(row[ name_column_title ], row[ name_column_isbn ], "|".join(list(set(value_lt))) )
+        df.loc[index, "nach_" + name_column_isbn + "_Bestand_Göttingen"] = "|".join(list(set(value_lt)))
 
 
         value_lt =  tree.xpath(xpath_place, namespaces = namespaces)
