@@ -33,7 +33,8 @@ def extract_fields_with_isbn( df,
         },
     name_column = "ISBN",
     delete_ILN = True,
-    find_key = "isb"
+    find_key = "isb",
+    verbose = False
     ):
 
 
@@ -43,7 +44,7 @@ def extract_fields_with_isbn( df,
     for index, row in df.iterrows():
         if len(str(row[ name_column ])) > 6:
             api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica." + find_key + "=" + str(row[ name_column ]) + "&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml"
-            #print(api_url)
+            if verbose == True: print(api_url)
 
             try:
                 tree = etree.parse(api_url).getroot()
@@ -64,13 +65,13 @@ def extract_fields_with_isbn( df,
                             df.loc[index, key] = value_lt[0]
             except:
                 print("error")
-    
-        try:
-            df.loc[index, "Titel_und_nach_ISBN_Titel_Ähnlichkeit_Score"] = round(SequenceMatcher(None, df.loc[index, "Titel"], df.loc[index, "nach_ISBN_Titel"]).ratio(), 2)
-        except:
-            pass
 
-        
+    
+    try:
+        df.loc[index, "Titel_und_nach_ISBN_Titel_Ähnlichkeit_Score"] = round(SequenceMatcher(None, df.loc[index, "Titel"], df.loc[index, "nach_ISBN_Titel"]).ratio(), 2)
+    except:
+        pass
+
 
     if "nach_" + name_column + "_ILNs" in df.columns.tolist():
         df["nach_" + name_column+ "_Bestand_K10"] = df["nach_" + name_column + "_ILNs"].str.count("[,;\-]") + 1
@@ -153,7 +154,7 @@ def extract_fields_with_title_author( df,
 
     for index, row in df.iterrows():
         try:
-            api_url = "http://sru.k10plus.de/" + database + "!rec=1?version=1.1&query=pica.tit=" + str(row[ name_column_title ]) + " and pica.per=" + str(row[ name_column_author ]) + "&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml"
+            api_url = 'http://sru.k10plus.de/' + database + '!rec=1?version=1.1&query=pica.tit="' + str(row[ name_column_title ]) + '" and pica.per="' + str(row[ name_column_author ]) + '"&operation=searchRetrieve&maximumRecords=100&recordSchema=picaxml'
 
             if verbose == True: print(api_url)
 
