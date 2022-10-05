@@ -22,6 +22,7 @@ def check_duplicate_with_isbn( df,
     xpath_number_records = '//zs:numberOfRecords/text()',
     xpath_place = '//pica:datafield[@tag="209A"]/pica:subfield[@code="f"]/text()',
     xpath_medium = '//pica:datafield[@tag="002@"]/pica:subfield[@code="0"]/text()',
+    xpath_ppn = '//pica:datafield[@tag="003@"]/pica:subfield[@code="0"]/text()',
 
     name_column_isbn = "ISBN",
     name_column_title = "Titel",
@@ -43,23 +44,30 @@ def check_duplicate_with_isbn( df,
         if verbose == True: print(api_url)
 
 
-        tree = etree.parse(api_url).getroot()
+        try:
+            tree = etree.parse(api_url).getroot()
 
 
-        value_lt =  tree.xpath(xpath_number_records, namespaces = namespaces)
-        if verbose == True: print(row[ name_column_title ], row[ name_column_isbn ], "|".join(list(set(value_lt))) )
-        df.loc[index, "nach_" + name_column_isbn + "_Bestand_Göttingen"] = "|".join(list(set(value_lt)))
+            value_lt =  tree.xpath(xpath_number_records, namespaces = namespaces)
+            if verbose == True: print(row[ name_column_title ], row[ name_column_isbn ], "|".join(list(set(value_lt))) )
+            df.loc[index, "nach_" + name_column_isbn + "_Bestand_Göttingen"] = "|".join(list(set(value_lt)))
 
 
-        value_lt =  tree.xpath(xpath_place, namespaces = namespaces)
-        df.loc[index, "nach_" + name_column_isbn + "_Ort_Göttingen"] = "|".join(list(set(value_lt)))
+            value_lt =  tree.xpath(xpath_place, namespaces = namespaces)
+            df.loc[index, "nach_" + name_column_isbn + "_Ort_Göttingen"] = "|".join(list(set(value_lt)))
 
 
-        value_lt =  tree.xpath(xpath_medium, namespaces = namespaces)
-        df.loc[index, "nach_" + name_column_isbn + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
+            value_lt =  tree.xpath(xpath_medium, namespaces = namespaces)
+            df.loc[index, "nach_" + name_column_isbn + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
+
+            value_lt =  tree.xpath(xpath_ppn, namespaces = namespaces)
+            df.loc[index, "nach_" + name_column_isbn + "_ppn_Göttingen"] = "|".join(list(set(value_lt)))
 
 
-        df.loc[index, "nach_" + name_column_isbn + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=6/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=isb+' + str(row[ name_column_isbn ]) + '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
+            df.loc[index, "nach_" + name_column_isbn + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=6/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=isb+' + str(row[ name_column_isbn ]) + '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
+        except:
+            df.loc[index, "nach_" + name_column_isbn + "_error"] = 1
+
 
 
     return df
@@ -127,6 +135,7 @@ def check_duplicate_with_title_author( df,
     xpath_number_records = '//zs:numberOfRecords/text()',
     xpath_place = '//pica:datafield[@tag="209A"]/pica:subfield[@code="f"]/text()',
     xpath_medium = '//pica:datafield[@tag="002@"]/pica:subfield[@code="0"]/text()',
+    xpath_year = '//pica:datafield[@tag="011@"]/pica:subfield[@code="a"]/text()',
     name_column_title = "Titel",
     name_column_author = "Nachname_Autor",
     verbose = False,
@@ -168,6 +177,9 @@ def check_duplicate_with_title_author( df,
             value_lt =  tree.xpath(xpath_medium, namespaces = namespaces)
             df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Medium_Göttingen"] = "|".join(list(set(value_lt)))
             #df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_Bestand_SUB"] = len(value_lt)
+
+            value_lt =  tree.xpath(xpath_year, namespaces = namespaces)
+            df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_year_Göttingen"] = "|".join(sorted(list(set(value_lt))))
 
 
             df.loc[index, "nach_" + name_column_title + "_" + name_column_author + "_URL_GUK"] = 'https://opac.sub.uni-goettingen.de/DB=1/SET=2/TTL=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=TIT"' +  title + '" and PER ' + author+  '&MATCFILTER=N&MATCSET=N&NOSCAN=N&ADI_BIB='
